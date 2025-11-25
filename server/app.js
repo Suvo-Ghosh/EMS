@@ -26,19 +26,20 @@ const allowedOrigins = [
     "https://ems333.netlify.app",
 ];
 
-// Filter out undefined values (in case FRONTEND_URL is not set)
-const filteredOrigins = allowedOrigins.filter(Boolean);
-
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps, curl)
-            if (!origin) return callback(null, true);
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true); // Mobile / Postman / curl
 
-            if (filteredOrigins.includes(origin)) {
-                return callback(null, true);
+            // allow partial matches
+            const isAllowed = allowedOrigins.some((allowed) =>
+                origin.startsWith(allowed)
+            );
+
+            if (isAllowed) {
+                callback(null, true);
             } else {
-                return callback(new Error("Not allowed by CORS"), false);
+                callback(new Error("CORS blocked: " + origin));
             }
         },
         credentials: true,
@@ -46,6 +47,7 @@ app.use(
         allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
+
 
 
 
