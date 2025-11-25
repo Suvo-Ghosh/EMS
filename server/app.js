@@ -20,33 +20,35 @@ app.use(express.json());
 //     allowedHeaders: ["Content-Type", "Authorization"],
 // }));
 
+
 const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    "http://localhost:5173",
-    "https://ems333.netlify.app",
+    process.env.FRONTEND_URL,       // your main frontend
+    "http://localhost:5173",        // local dev
+    "https://ems333.netlify.app",   // Netlify production
 ];
+
+// Function to match wildcard: *.netlify.app
+const netlifyRegex = /^https:\/\/.*\.netlify\.app$/;
 
 app.use(
     cors({
         origin: (origin, callback) => {
-            if (!origin) return callback(null, true); // Mobile / Postman / curl
+            // No origin → allow (Postman, curl, mobile)
+            if (!origin) return callback(null, true);
 
-            // allow partial matches
-            const isAllowed = allowedOrigins.some((allowed) =>
-                origin.startsWith(allowed)
-            );
+            const isAllowed =
+                allowedOrigins.some((allowed) => origin.startsWith(allowed)) ||
+                netlifyRegex.test(origin); // allow all Netlify preview builds
 
-            if (isAllowed) {
-                callback(null, true);
-            } else {
-                callback(new Error("CORS blocked: " + origin));
-            }
+            if (isAllowed) callback(null, true);
+            else callback(new Error("CORS blocked for: " + origin));
         },
         credentials: true,
         methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
+
 
 
 
