@@ -6,14 +6,13 @@ import Settings from "./pages/Settings.jsx";
 import Login from "./pages/Login.jsx";
 import Employees from "./pages/Employees.jsx";
 import Profile from "./pages/Profile.jsx";
+import Payroll from "./pages/Payroll.jsx";
+import MyPayslips from "./pages/MyPayslips.jsx";
 import ForgotPasswordModal from "./modals/ForgotPasswordModal.jsx";
 import VerifyOtpModal from "./modals/VerifyOtpModal.jsx";
 import ResetPasswordModal from "./modals/ResetPasswordModal.jsx";
 import EmployeeEdit from "./pages/EmployeeEdit.jsx";
 import { Toaster } from "sonner";
-import PayrollList from "./pages/payroll/PayrollList.jsx";
-import CreatePayroll from "./pages/payroll/CreatePayroll.jsx";
-import PayrollDetails from "./pages/payroll/PayrollDetails.jsx";
 
 const App = () => {
   return (
@@ -29,16 +28,13 @@ const App = () => {
           <Route path="/" element={<AppShell><Dashboard /></AppShell>} />
           <Route path="/profile" element={<AppShell><Profile /></AppShell>} />
           <Route path="/settings" element={<AppShell><Settings /></AppShell>} />
-          <Route path="/payroll" element={<PayrollList />} />
-          <Route path="/payroll/create" element={<CreatePayroll />} />
-          <Route path="/payroll/:id" element={<PayrollDetails />} />
-
+          <Route path="/my-payslips" element={<AppShell><MyPayslips /></AppShell>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["superAdmin", "admin", "hr"]} />}>
           <Route path="/employees" element={<AppShell><Employees /></AppShell>} />
           <Route path="/employee/edit/:id" element={<AppShell><EmployeeEdit /></AppShell>} />
+          <Route path="/payroll" element={<AppShell><Payroll /></AppShell>} />
 
-          {/* Add other routes (employees, payroll, etc.) similarly */}
         </Route>
       </Routes>
     </>

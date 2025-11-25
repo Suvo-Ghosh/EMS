@@ -9,7 +9,6 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         fullName: "",
         email: "",
         password: "Hashtago@2023",
-        employeeCode: "",
         departmentType: "IT",
         designation: "",
         dateOfJoining: "",
@@ -26,8 +25,8 @@ const AddEmployee = ({ onClose, onSuccess }) => {
     const [error, setError] = useState("");
 
     // 🔹 live employeeCode check: idle | checking | available | taken | error
-    const [codeStatus, setCodeStatus] = useState("idle");
-    const [codeStatusMsg, setCodeStatusMsg] = useState("");
+    // const [codeStatus, setCodeStatus] = useState("idle");
+    // const [codeStatusMsg, setCodeStatusMsg] = useState("");
 
     const addRef = useRef();
     // Close modal if clicked outside
@@ -52,53 +51,53 @@ const AddEmployee = ({ onClose, onSuccess }) => {
     };
 
     // 🔹 Debounced check for employeeCode availability
-    useEffect(() => {
-        // Only for employee role
-        if (form.role !== "employee") {
-            setCodeStatus("idle");
-            setCodeStatusMsg("");
-            return;
-        }
+    // useEffect(() => {
+    //     // Only for employee role
+    //     if (form.role !== "employee") {
+    //         setCodeStatus("idle");
+    //         setCodeStatusMsg("");
+    //         return;
+    //     }
 
-        const code = form.employeeCode.trim();
+    //     const code = form.employeeCode.trim();
 
-        if (!code) {
-            setCodeStatus("idle");
-            setCodeStatusMsg("");
-            return;
-        }
+    //     if (!code) {
+    //         setCodeStatus("idle");
+    //         setCodeStatusMsg("");
+    //         return;
+    //     }
 
-        setCodeStatus("checking");
-        setCodeStatusMsg("Checking code availability...");
+    //     setCodeStatus("checking");
+    //     setCodeStatusMsg("Checking code availability...");
 
-        const timer = setTimeout(async () => {
-            try {
-                const { data } = await api.get("/api/admin/employees/check-code", {
-                    params: { employeeCode: code },
-                });
+    //     const timer = setTimeout(async () => {
+    //         try {
+    //             const { data } = await api.get("/api/admin/employees/check-code", {
+    //                 params: { employeeCode: code },
+    //             });
 
-                if (!data.ok) {
-                    setCodeStatus("error");
-                    setCodeStatusMsg(data.message || "Could not verify code.");
-                    return;
-                }
+    //             if (!data.ok) {
+    //                 setCodeStatus("error");
+    //                 setCodeStatusMsg(data.message || "Could not verify code.");
+    //                 return;
+    //             }
 
-                if (data.exists) {
-                    setCodeStatus("taken");
-                    setCodeStatusMsg("This employee code is already in use.");
-                } else {
-                    setCodeStatus("available");
-                    setCodeStatusMsg("This employee code is available.");
-                }
-            } catch (err) {
-                console.error("Employee code check error:", err);
-                setCodeStatus("error");
-                setCodeStatusMsg("Error checking employee code.");
-            }
-        }, 500); // debounce 500ms
+    //             if (data.exists) {
+    //                 setCodeStatus("taken");
+    //                 setCodeStatusMsg("This employee code is already in use.");
+    //             } else {
+    //                 setCodeStatus("available");
+    //                 setCodeStatusMsg("This employee code is available.");
+    //             }
+    //         } catch (err) {
+    //             console.error("Employee code check error:", err);
+    //             setCodeStatus("error");
+    //             setCodeStatusMsg("Error checking employee code.");
+    //         }
+    //     }, 500); // debounce 500ms
 
-        return () => clearTimeout(timer);
-    }, [form.employeeCode, form.role]);
+    //     return () => clearTimeout(timer);
+    // }, [form.employeeCode, form.role]);
 
     // Handle submit - build payload to match backend expectations
     const handleSubmit = async (e) => {
@@ -107,13 +106,13 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         setError("");
 
         // Small guard on frontend: don't allow submit if code is clearly taken
-        if (form.role === "employee" && codeStatus === "taken") {
-            const msg = "Employee code is already in use. Please choose another.";
-            setError(msg);
-            toast.error(msg);
-            setLoading(false);
-            return;
-        }
+        // if (form.role === "employee" && codeStatus === "taken") {
+        //     const msg = "Employee code is already in use. Please choose another.";
+        //     setError(msg);
+        //     toast.error(msg);
+        //     setLoading(false);
+        //     return;
+        // }
 
         try {
             const payload = {
@@ -124,7 +123,6 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                 employeeProfile:
                     form.role === "employee"
                         ? {
-                            employeeCode: form.employeeCode.trim(),
                             department: form.departmentType,
                             designation: form.designation || undefined,
                             dateOfJoining: form.dateOfJoining || undefined,
@@ -168,16 +166,16 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         }
     };
 
-    const codeStatusColor =
-        codeStatus === "taken"
-            ? "text-red-500"
-            : codeStatus === "available"
-                ? "text-emerald-500"
-                : codeStatus === "checking"
-                    ? "text-slate-500"
-                    : codeStatus === "error"
-                        ? "text-red-500"
-                        : "text-slate-500";
+    // const codeStatusColor =
+    //     codeStatus === "taken"
+    //         ? "text-red-500"
+    //         : codeStatus === "available"
+    //             ? "text-emerald-500"
+    //             : codeStatus === "checking"
+    //                 ? "text-slate-500"
+    //                 : codeStatus === "error"
+    //                     ? "text-red-500"
+    //                     : "text-slate-500";
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur flex justify-center items-center px-4">
@@ -242,18 +240,19 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                             readOnly={true}
                         />
                         <div>
-                            <Input
+                            {/* <Input
                                 label="Employee Code"
                                 name="employeeCode"
                                 value={form.employeeCode}
                                 onChange={handleChange}
                                 required={form.role === "employee"}
-                            />
-                            {form.role === "employee" && form.employeeCode && (
+                                placeholder="HTEMP101"
+                            /> */}
+                            {/* {form.role === "employee" && form.employeeCode && (
                                 <p className={`mt-1 text-[11px] ${codeStatusColor}`}>
                                     {codeStatusMsg}
                                 </p>
-                            )}
+                            )} */}
                         </div>
 
                         <div>
@@ -267,6 +266,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                                 className="block w-full mt-1 p-2 md:p-2.5 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             >
                                 <option value="Creative">Creative</option>
+                                <option value="HR">HR</option>
                                 <option value="IT">IT</option>
                                 <option value="Sales">Sales</option>
                             </select>
@@ -350,7 +350,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                         </div>
 
                         {/* Role */}
-                        <div>
+                        {/* <div>
                             <label className="text-xs md:text-sm font-medium mb-2">
                                 Role
                             </label>
@@ -362,9 +362,8 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                             >
                                 <option value="employee">Employee</option>
                                 <option value="admin">Admin</option>
-                                <option value="hr">HR</option>
                             </select>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Buttons row spans full width */}
@@ -374,7 +373,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                         </SecondaryButton>
                         <PrimaryButton
                             type="submit"
-                            disabled={loading || (form.role === "employee" && codeStatus === "taken")}
+                            disabled={loading}
                         >
                             {loading ? "Adding..." : "Add Employee"}
                         </PrimaryButton>

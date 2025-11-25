@@ -118,7 +118,7 @@ const Profile = () => {
                     <CardTitle>Account Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 text-sm">
                         <ProfileField label="Full Name" value={user?.fullName || "—"} />
                         <ProfileField label="Email" value={user?.email || "—"} />
                         <ProfileField label="Role" value={user?.role || "—"} />
@@ -138,7 +138,7 @@ const Profile = () => {
                         <CardTitle>Employee Details</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 text-sm">
                             <ProfileField
                                 label="Employee Code"
                                 value={employee?.employeeCode || "—"}
@@ -189,6 +189,29 @@ const Profile = () => {
                                 <ProfileField
                                     label="Deductions"
                                     value={`₹${employee.salary.deductions}`}
+                                />
+                            )}
+
+                            {/* Bank Account Details */}
+                            {employee?.salary?.deductions != null && (
+                                <ProfileField
+                                    label="Bank Name"
+                                    // value={`₹${employee?.bankAccount?.bankName}`}
+                                    value={`PNB`}
+                                />
+                            )}
+                            {employee?.salary?.deductions != null && (
+                                <ProfileField
+                                    label="Bank Account NO."
+                                    // value={`₹${employee?.bankAccount?.bankAccount}`}
+                                    value={`17000152666`}
+                                />
+                            )}
+                            {employee?.salary?.deductions != null && (
+                                <ProfileField
+                                    label="IFSE Code"
+                                    // value={`₹${employee?.bankAccount?.bankAccount}`}
+                                    value={`PUNB12345`}
                                 />
                             )}
                         </div>

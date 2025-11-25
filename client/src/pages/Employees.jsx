@@ -98,8 +98,8 @@ const Employees = () => {
             {!loading && !error && employees.length === 0 && (
                 <Card className="mt-3">
                     <CardContent>
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                            No employees found yet. Start by adding your first employee.
+                        <p className="text-sm text-center text-slate-600 dark:text-slate-300">
+                            No employees found yet. Start by adding first employee.
                         </p>
                     </CardContent>
                 </Card>

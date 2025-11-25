@@ -25,7 +25,7 @@ const Settings = () => {
                         <div className="flex flex-col sm:flex-row gap-3">
                             <ThemeOption
                                 label="System"
-                                description="Match your OS theme"
+                                description="Match OS theme"
                                 value="system"
                                 current={theme}
                                 onChange={setTheme}
@@ -60,8 +60,8 @@ const ThemeOption = ({ label, description, value, current, onChange }) => {
             type="button"
             onClick={() => onChange(value)}
             className={`flex-1 text-left border rounded-lg px-4 py-3 text-sm transition-colors ${isSelected
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40"
-                    : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40"
+                : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
         >
             <div className="flex items-center justify-between mb-1">

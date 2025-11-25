@@ -7,6 +7,8 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 import { ROLES } from "../configs/roles.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { generateNextEmployeeCode } from "../utils/generateEmployeeCode.js";
+
 
 const router = express.Router();
 
@@ -38,28 +40,30 @@ router.use(roleMiddleware([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]));
  * GET /api/admin/employees/check-code?employeeCode=HTEMP101
  * Quick availability check for employeeCode
  */
-router.get("/employees/check-code", async (req, res) => {
-  const { employeeCode } = req.query;
+// router.get("/employees/check-code", async (req, res) => {
+//   const { employeeCode } = req.query;
 
-  if (!employeeCode || typeof employeeCode !== "string") {
-    return res
-      .status(400)
-      .json({ ok: false, message: "employeeCode query param is required" });
-  }
+//   if (!employeeCode || typeof employeeCode !== "string") {
+//     return res
+//       .status(400)
+//       .json({ ok: false, message: "employeeCode query param is required" });
+//   }
 
-  try {
-    const existing = await Employee.findOne({ employeeCode: employeeCode.trim() });
-    return res.json({
-      ok: true,
-      exists: !!existing,
-    });
-  } catch (err) {
-    console.error("Check employeeCode error:", err.message);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Server error while checking employeeCode" });
-  }
-});
+//   try {
+//     const existing = await Employee.findOne({ employeeCode: employeeCode.trim() });
+//     return res.json({
+//       ok: true,
+//       exists: !!existing,
+//     });
+//   } catch (err) {
+//     console.error("Check employeeCode error:", err.message);
+//     return res
+//       .status(500)
+//       .json({ ok: false, message: "Server error while checking employeeCode" });
+//   }
+// });
+
+
 
 
 /**
@@ -138,18 +142,20 @@ router.post(
           .json({ ok: false, message: "User with this email already exists" });
       }
 
-      // 3) If employee, also check employeeCode BEFORE creating anything
-      if (requestedRole === ROLES.EMPLOYEE && employeeProfile) {
-        const { employeeCode } = employeeProfile;
 
-        if (!employeeCode) {
-          return res.status(400).json({
-            ok: false,
-            message: "employeeProfile.employeeCode is required for employees",
-          });
+      // 3) If employee, decide employeeCode (use client value or auto-generate)
+      let finalEmployeeCode = null;
+      if (requestedRole === ROLES.EMPLOYEE) {
+        const clientCode = employeeProfile?.employeeCode?.trim();
+
+        if (clientCode) {
+          finalEmployeeCode = clientCode;
+        } else {
+          // auto-generate like HTEMP101, HTEMP102...
+          finalEmployeeCode = await generateNextEmployeeCode();
         }
 
-        const existingCode = await Employee.findOne({ employeeCode });
+        const existingCode = await Employee.findOne({ employeeCode: finalEmployeeCode });
         if (existingCode) {
           return res.status(400).json({
             ok: false,
@@ -157,6 +163,7 @@ router.post(
           });
         }
       }
+
 
       // 4) Now it is safe to create User
       const hash = await bcrypt.hash(password, 10);
@@ -174,7 +181,6 @@ router.post(
       // 5) If we are creating an employee, create Employee record
       if (requestedRole === ROLES.EMPLOYEE && employeeProfile) {
         const {
-          employeeCode,
           department,
           designation,
           dateOfJoining,
@@ -184,7 +190,7 @@ router.post(
 
         employeeDoc = await Employee.create({
           user: newUser._id,
-          employeeCode,
+          employeeCode: finalEmployeeCode,
           department,
           designation,
           dateOfJoining,

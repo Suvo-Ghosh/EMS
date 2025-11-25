@@ -1,13 +1,14 @@
 import React from "react";
 
 // Reusable Input component
-export const Input = ({ label, name, value, onChange, type = "text", required = false, readOnly = false }) => (
+export const Input = ({ label, name,placeholder, value, onChange, type = "text", required = false, readOnly = false }) => (
     <div className="flex flex-col">
         <label htmlFor={name} className="text-xs md:text-sm font-medium mb-2 text-slate-700 dark:text-slate-200">
             {label}
         </label>
         <input
             type={type}
+            placeholder={placeholder}
             name={name}
             id={name}
             value={value}

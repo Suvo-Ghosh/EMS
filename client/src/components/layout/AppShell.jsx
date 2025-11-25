@@ -91,18 +91,18 @@ const AppShell = ({ children }) => {
                 {/* Desktop sidebar - fixed, full viewport height */}
                 <aside
                     className="
-            hidden md:flex
-            md:fixed md:inset-y-0 md:left-0
-            md:w-64 md:flex-col md:h-screen
-            bg-white dark:bg-slate-950
-            border-r border-slate-200 dark:border-slate-800
-          "
+                               hidden md:flex
+                               md:fixed md:inset-y-0 md:left-0
+                               md:w-60 xl:w-60 md:flex-col md:h-screen
+                               bg-white dark:bg-slate-950
+                               border-r border-slate-200 dark:border-slate-800
+                               "
                 >
                     <SidebarContent user={user} theme={theme} logout={logout} />
                 </aside>
 
                 {/* Main content area */}
-                <div className="flex-1 flex flex-col min-w-0 md:ml-64 md:h-screen">
+                <div className="flex-1 flex flex-col min-w-0 md:ml-60 xl:ml-60 md:h-screen">
                     {/* Desktop top bar */}
                     <header className="hidden md:flex h-14 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur items-center justify-between px-6">
                         <h1 className="text-base font-semibold truncate">
@@ -132,6 +132,9 @@ const SidebarContent = ({ user, theme, logout, onNavigate }) => {
     if (isManagement) {
         links.push({ to: "/employees", label: "Employees", icon: HiOutlineUsers });
         links.push({ to: "/payroll", label: "Payroll", icon: HiOutlineCurrencyRupee });
+    } else {
+        // employee-specific payroll view
+        links.push({ to: "/my-payslips", label: "My Payslips", icon: HiOutlineCurrencyRupee });
     }
 
     links.push({ to: "/profile", label: "Profile", icon: HiOutlineUserCircle });
@@ -193,7 +196,7 @@ const SidebarLink = ({ to, label, icon: Icon, onClick }) => (
             `${navLinkBase} ${isActive ? activeNav : inactiveNav}`
         }
     >
-        {Icon && <Icon className="w-5 h-5 flex-shrink-0" />}  {/* 👈 icon here */}
+        {Icon && <Icon className="w-5 h-5 flex-shrink-0" />}
         <span className="truncate">{label}</span>
     </NavLink>
 );
