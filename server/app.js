@@ -30,25 +30,24 @@ const allowedOrigins = [
 // Function to match wildcard: *.netlify.app
 const netlifyRegex = /^https:\/\/.*\.netlify\.app$/;
 
-// app.use(
-//     cors({
-//         origin: (origin, callback) => {
-//             // No origin → allow (Postman, curl, mobile)
-//             if (!origin) return callback(null, true);
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // No origin → allow (Postman, curl, mobile)
+            if (!origin) return callback(null, true);
 
-//             const isAllowed =
-//                 allowedOrigins.some((allowed) => origin.startsWith(allowed)) ||
-//                 netlifyRegex.test(origin); // allow all Netlify preview builds
+            const isAllowed =
+                allowedOrigins.some((allowed) => origin.startsWith(allowed)) ||
+                netlifyRegex.test(origin); // allow all Netlify preview builds
 
-//             if (isAllowed) callback(null, true);
-//             else callback(new Error("CORS blocked for: " + origin));
-//         },
-//         credentials: true,
-//         methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-//         allowedHeaders: ["Content-Type", "Authorization"],
-//     })
-// );
-app.use(cors());
+            if (isAllowed) callback(null, true);
+            else callback(new Error("CORS blocked for: " + origin));
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 
 
 

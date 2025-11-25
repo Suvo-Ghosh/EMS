@@ -1,4 +1,3 @@
-// server/routes/payrollRoutes.js
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
@@ -7,7 +6,7 @@ import { listRuns, runPayroll, listMyPayslips, listPayslipsForRun, downloadPdfPa
 
 const router = express.Router();
 
-// every route here requires login
+// every route requires login
 router.use(authMiddleware);
 
 const MANAGEMENT_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR];

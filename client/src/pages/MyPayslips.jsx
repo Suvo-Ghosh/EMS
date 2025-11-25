@@ -1,4 +1,3 @@
-// src/pages/MyPayslips.jsx
 import { useEffect, useState } from "react";
 import api from "../api/axios.js";
 import PageHeader from "../components/ui/PageHeader.jsx";

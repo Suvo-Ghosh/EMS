@@ -50,6 +50,22 @@ export const sendEmail = async ({ to, subject, html, otp }) => {
       html: mailHtml,
     });
 
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error("SMTP verify error:", error);
+      } else {
+        console.log("SMTP server is ready to take messages");
+      }
+    });
+
+    console.log("SMTP CONFIG:", {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      user: process.env.SMTP_USER,
+      secure: process.env.SMTP_SECURE,
+    });
+
+
     console.log(`✅ Email sent to ${to}`);
 
     console.log("✅ Email accepted by SMTP:", {
