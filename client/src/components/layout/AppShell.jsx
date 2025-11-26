@@ -46,8 +46,17 @@ const AppShell = ({ children }) => {
                         <path d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
+                <div className="flex-shrink-0">
+                    <div className="size-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
+                        {
+                            user?.profileImage
+                                ? <img src={user?.profileImage} className="rounded-full" />
+                                : initials
+                        }
+                    </div>
+                </div>
 
-                <span className="font-semibold text-sm truncate">
+                {/* <span className="font-semibold text-sm truncate">
                     EMS &amp; Payroll
                 </span>
 
@@ -57,7 +66,7 @@ const AppShell = ({ children }) => {
                     className="text-xs font-medium text-red-500 hover:text-red-400"
                 >
                     Logout
-                </button>
+                </button> */}
             </header>
 
             {/* Mobile sliding sidebar + overlay */}
@@ -104,10 +113,17 @@ const AppShell = ({ children }) => {
                 {/* Main content area */}
                 <div className="flex-1 flex flex-col min-w-0 md:ml-60 xl:ml-60 md:h-screen">
                     {/* Desktop top bar */}
-                    <header className="hidden md:flex h-14 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur items-center justify-between px-6">
-                        <h1 className="text-base font-semibold truncate">
-                            Employee Management &amp; Payroll
-                        </h1>
+                    <header className="hidden md:flex h-14 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur items-center justify-end px-6">
+                        <div className="flex justify-center items-center gap-4">
+                            <p>{user?.fullName}</p>
+                            <div className="size-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
+                                {
+                                    user?.profileImage
+                                        ? <img src={user?.profileImage} className="rounded-full" />
+                                        : initials
+                                }
+                            </div>
+                        </div>
                     </header>
 
                     {/* Page content (scrollable on desktop) */}

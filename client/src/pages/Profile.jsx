@@ -123,7 +123,7 @@ const Profile = () => {
                     <CardTitle>Account Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 xxs:grid-cols-2 gap-y-4  text-sm">
                         <ProfileField label="Full Name" value={user?.fullName || "—"} />
                         <ProfileField label="Email" value={user?.email || "—"} />
                         <ProfileField label="Role" value={user?.role || "—"} />
@@ -143,7 +143,7 @@ const Profile = () => {
                         <CardTitle>Employee Details</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 xxs:grid-cols-2 lg:grid-cols-4 gap-y-4 text-sm">
                             <ProfileField
                                 label="Employee Code"
                                 value={employee?.employeeCode || "—"}
