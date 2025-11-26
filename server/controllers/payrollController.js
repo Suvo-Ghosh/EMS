@@ -1,7 +1,7 @@
+import PDFDocument from "pdfkit";
 import PayrollRun from "../models/PayrollRun.js";
 import Payslip from "../models/Payslip.js";
 import Employee from "../models/Employee.js";
-import PDFDocument from "pdfkit";
 import User from "../models/User.js";
 
 
@@ -50,7 +50,8 @@ export const runPayroll = async (req, res) => {
         if (existingRun) {
             return res.status(400).json({
                 ok: false,
-                message: "Payroll already processed for this month/year",
+                // message: `Payroll already processed for this month in this year`,
+                message: `Payroll already processed for this month in ${year}`,
             });
         }
 
@@ -482,7 +483,6 @@ export const downloadPdfPayslips = async (req, res) => {
         }
     }
 };
-
 
 
 /**

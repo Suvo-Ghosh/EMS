@@ -36,7 +36,7 @@ const EmployeeEdit = () => {
                 allowances: 0,
                 deductions: 0,
             },
-            department: "IT",
+            department: "it",
             designation: "",
         },
     });
@@ -52,6 +52,7 @@ const EmployeeEdit = () => {
                 const { data } = await api.get(`/api/admin/users/${id}`);
                 if (data.ok) {
                     setEmployee(data.user);
+                    console.log(data.employee);
 
                     setForm({
                         fullName: data.user.fullName,
@@ -69,7 +70,7 @@ const EmployeeEdit = () => {
                                 allowances: data.employee?.salary?.allowances || 0,
                                 deductions: data.employee?.salary?.deductions || 0,
                             },
-                            department: data.employee?.department || "IT",
+                            department: data.employee?.department || "",
                             designation: data.employee?.designation || "",
                         },
                     });
@@ -183,7 +184,7 @@ const EmployeeEdit = () => {
                         >
                             <option value="employee">Employee</option>
                             <option value="admin">Admin</option>
-                            <option value="hr">HR</option>
+                            {/* <option value="hr">HR</option> */}
                         </select>
                     </div>
                     <div>
@@ -210,6 +211,7 @@ const EmployeeEdit = () => {
                             <option value="creative">Creative</option>
                             <option value="it">IT</option>
                             <option value="sales">Sales</option>
+                            <option value="hr">HR</option>
                         </select>
                     </div>
 

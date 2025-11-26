@@ -1,5 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 import { body, validationResult } from "express-validator";
 import User from "../models/User.js";
 import Employee from "../models/Employee.js";
@@ -8,6 +10,7 @@ import { generateToken } from "../utils/generateToken.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { upload, uploadToCloudinary } from "../utils/cloudinary.js";
 
 const router = express.Router();
 
@@ -20,6 +23,7 @@ const buildUserPayload = async (userDoc) => {
     email: userDoc.email,
     role: userDoc.role,
     status: userDoc.status,
+    profileImage: userDoc.profileImage,
     createdAt: userDoc.createdAt,
     updatedAt: userDoc.updatedAt,
   };
@@ -35,6 +39,7 @@ const buildUserPayload = async (userDoc) => {
     employee, // null for non-employees, object for employees
   };
 };
+
 
 /**
  * POST /api/auth/login
@@ -185,27 +190,18 @@ router.post(
   }
 );
 
-/**
- * GET /api/auth/me
- * Get current authenticated user
- */
-router.get("/me", authMiddleware, async (req, res) => {
-  res.json({
-    ok: true,
-    user: req.user,
-  });
-});
 
 
+// /**
+//  * POST /api/auth/edit-profile
+//  * Authenticated user can update fullName and email & profile image
+//  * body: { fullName, email }, req :{ file }
+//  */
 
-/**
- * POST /api/auth/edit-profile
- * Authenticated user can update fullName and email
- * body: { fullName, email }
- */
 router.post(
   "/edit-profile",
   authMiddleware,
+  upload.single("profileImage"), //  handle file "profileImage"
   [
     body("fullName").trim().notEmpty().withMessage("Full name is required"),
     body("email").isEmail().withMessage("Valid email is required"),
@@ -219,6 +215,7 @@ router.post(
     try {
       const userId = req.user.id || req.user._id;
       const { fullName, email } = req.body;
+      const file = req.file; //  multer adds this
 
       const user = await User.findById(userId);
       if (!user) {
@@ -245,10 +242,24 @@ router.post(
       user.fullName = fullName.trim();
       user.email = normalizedEmail;
 
+      // Handle profile image upload
+      if (file) {
+        // If you want to delete old image:
+        if (user.profileImagePublicId) {
+          try {
+            await cloudinary.uploader.destroy(user.profileImagePublicId);
+          } catch (err) {
+            console.warn("Failed to delete old profile image:", err.message);
+          }
+        }
+
+        const uploadResult = await uploadToCloudinary(file.buffer);
+        user.profileImage = uploadResult.secure_url;
+        user.profileImagePublicId = uploadResult.public_id;
+      }
+
       await user.save();
 
-      // You can decide whether to re-issue token; for now we keep the old token
-      // and just return updated user data
       return res.json({
         ok: true,
         message: "Profile updated successfully",
@@ -258,12 +269,13 @@ router.post(
           email: user.email,
           role: user.role,
           status: user.status,
+          profileImage: user.profileImage || "",
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
       });
     } catch (err) {
-      console.error("Edit profile error:", err.message);
+      console.error("Edit profile error:", err);
       return res
         .status(500)
         .json({ ok: false, message: "Server error" });
@@ -275,7 +287,8 @@ router.post(
 
 
 
-// In-memory store (use a better storage like Redis in production)
+
+// In-memory OTP store (use a better storage like Redis in production)
 let otpStore = {};
 
 const OTP_EXPIRATION_TIME = 10 * 60 * 1000; // 10 minutes
@@ -285,8 +298,7 @@ const OTP_EXPIRATION_TIME = 10 * 60 * 1000; // 10 minutes
  * Request OTP for password reset
  * body: { email }
  */
-router.post(
-  "/forgot-password",
+router.post("/forgot-password",
   [body("email").isEmail().withMessage("Valid email is required")],
   async (req, res) => {
     const errors = validationResult(req);
@@ -325,8 +337,7 @@ router.post(
  * Verify OTP for password reset
  * body: { email, otp }
  */
-router.post(
-  "/verify-otp",
+router.post("/verify-otp",
   [
     body("email").isEmail().withMessage("Valid email is required"),
     body("otp")
@@ -373,8 +384,7 @@ router.post(
  * Reset password using OTP
  * body: { email, otp, newPassword }
  */
-router.post(
-  "/reset-password-with-otp",
+router.post("/reset-password-with-otp",
   [
     body("email").isEmail().withMessage("Valid email is required"),
     body("otp")
@@ -432,7 +442,6 @@ router.post(
     }
   }
 );
-
 
 
 export default router;

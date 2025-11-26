@@ -9,7 +9,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         fullName: "",
         email: "",
         password: "Hashtago@2023",
-        departmentType: "IT",
+        departmentType: "",
         designation: "",
         dateOfJoining: "",
         employmentType: "full-time",
@@ -265,10 +265,10 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                                 onChange={handleChange}
                                 className="block w-full mt-1 p-2 md:p-2.5 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             >
-                                <option value="Creative">Creative</option>
-                                <option value="HR">HR</option>
-                                <option value="IT">IT</option>
-                                <option value="Sales">Sales</option>
+                                <option value="creative">Creative</option>
+                                <option value="hr">HR</option>
+                                <option value="it">IT</option>
+                                <option value="sales">Sales</option>
                             </select>
                         </div>
                         <Input

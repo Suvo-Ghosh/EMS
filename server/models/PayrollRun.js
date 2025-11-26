@@ -1,4 +1,3 @@
-// server/models/PayrollRun.js
 import mongoose from "mongoose";
 
 const payrollRunSchema = new mongoose.Schema(

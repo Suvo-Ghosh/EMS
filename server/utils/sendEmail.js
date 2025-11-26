@@ -17,7 +17,7 @@ export const sendEmail = async ({ to, subject, html, otp }) => {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
-      secure: false,
+      secure: process.env.SMTP_SECURE || false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -50,20 +50,20 @@ export const sendEmail = async ({ to, subject, html, otp }) => {
       html: mailHtml,
     });
 
-    transporter.verify((error, success) => {
-      if (error) {
-        console.error("SMTP verify error:", error);
-      } else {
-        console.log("SMTP server is ready to take messages");
-      }
-    });
+    // transporter.verify((error, success) => {
+    //   if (error) {
+    //     console.error("SMTP verify error:", error);
+    //   } else {
+    //     console.log("SMTP server is ready to take messages");
+    //   }
+    // });
 
-    console.log("SMTP CONFIG:", {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      user: process.env.SMTP_USER,
-      secure: process.env.SMTP_SECURE,
-    });
+    // console.log("SMTP CONFIG:", {
+    //   host: process.env.SMTP_HOST,
+    //   port: process.env.SMTP_PORT,
+    //   user: process.env.SMTP_USER,
+    //   secure: process.env.SMTP_SECURE,
+    // });
 
 
     console.log(`✅ Email sent to ${to}`);

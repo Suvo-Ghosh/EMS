@@ -28,7 +28,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "inactive", "suspended"],
       default: "active"
-    }
+    },
+    profileImage: {
+      type: String,
+      default: ""
+    },
+    profileImagePublicId: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true

@@ -93,7 +93,7 @@ function ChangePassword({ onClose }) {
                         {/* Buttons row spans full width */}
                         <div className="flex justify-between mt-4 md:col-span-2">
                             <SecondaryButton type="button" onClick={onClose}>
-                                Cancel
+                                Back
                             </SecondaryButton>
                             <PrimaryButton type="submit" disabled={loading}>
                                 {loading ? "Submitting..." : "Change Password"}

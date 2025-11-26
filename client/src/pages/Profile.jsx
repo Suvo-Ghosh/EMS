@@ -38,6 +38,7 @@ const Profile = () => {
         [employee]
     );
 
+
     return (
         <div className="">
             <PageHeader
@@ -51,7 +52,11 @@ const Profile = () => {
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                         <div className="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
-                            {initials}
+                            {
+                                user?.profileImage
+                                    ? <img src={user?.profileImage} className="rounded-full" />
+                                    : initials
+                            }
                         </div>
                     </div>
 
@@ -226,6 +231,7 @@ const Profile = () => {
             {showProfileEditModal && (
                 <ProfileEdit
                     initialName={user?.fullName}
+                    initialProfileImage={user?.profileImage}
                     initialEmail={user?.email}
                     onClose={() => setShowProfileEditModal(false)}
                     onSuccess={(updatedUser) => {
