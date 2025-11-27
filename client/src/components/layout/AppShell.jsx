@@ -11,6 +11,7 @@ import {
     HiOutlineUserCircle,
     HiOutlineCog6Tooth,
 } from "react-icons/hi2";
+import { useMemo } from "react";
 
 const navLinkBase =
     "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors";
@@ -24,6 +25,13 @@ const AppShell = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const closeSidebar = () => setSidebarOpen(false);
+
+    const initials = useMemo(() => {
+        if (!user?.fullName) return "U";
+        const parts = user.fullName.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }, [user]);
 
     return (
         <div className="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
@@ -47,7 +55,7 @@ const AppShell = ({ children }) => {
                     </svg>
                 </button>
                 <div className="flex-shrink-0">
-                    <div className="size-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
+                    <div className="size-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
                         {
                             user?.profileImage
                                 ? <img src={user?.profileImage} className="rounded-full" />
@@ -56,17 +64,6 @@ const AppShell = ({ children }) => {
                     </div>
                 </div>
 
-                {/* <span className="font-semibold text-sm truncate">
-                    EMS &amp; Payroll
-                </span>
-
-                <button
-                    type="button"
-                    onClick={logout}
-                    className="text-xs font-medium text-red-500 hover:text-red-400"
-                >
-                    Logout
-                </button> */}
             </header>
 
             {/* Mobile sliding sidebar + overlay */}
@@ -115,19 +112,20 @@ const AppShell = ({ children }) => {
                     {/* Desktop top bar */}
                     <header className="hidden md:flex h-14 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur items-center justify-end px-6">
                         <div className="flex justify-center items-center gap-4">
-                            <p>{user?.fullName}</p>
-                            <div className="size-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
+                            <p>{user?.fullName.trim().split(/\s+/)[0]}</p>
+                            {/* <p>{user?.fullName.trim()}</p> */}
+                            <NavLink to="/profile" className="size-12 cursor-pointer rounded-full bg-blue-600 text-white flex items-center justify-center text-base font-semibold">
                                 {
                                     user?.profileImage
                                         ? <img src={user?.profileImage} className="rounded-full" />
                                         : initials
                                 }
-                            </div>
+                            </NavLink>
                         </div>
                     </header>
 
                     {/* Page content (scrollable on desktop) */}
-                    <main className="flex-1 p-4 sm:p-6 overflow-y-auto no-scrollbar">
+                    <main className="flex-1 p-3 sm:p-4 overflow-y-auto no-scrollbar">
                         {children}
                     </main>
                 </div>

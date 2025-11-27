@@ -15,7 +15,7 @@ const formatDate = (value) => {
 };
 
 const Profile = () => {
-    const { user, updateUser } = useAuth();   // 🔹 now also have updateUser
+    const { user, updateUser } = useAuth();   
     const employee = user?.employee || null;
     const isEmployee = user?.role === "employee" && !!employee;
     const [showResetModal, setShowResetModal] = useState(false);
@@ -80,7 +80,7 @@ const Profile = () => {
                             </p>
                         )}
 
-                        {accountCreatedDate && (
+                        {accountCreatedDate && user?.role === "superAdmin" && (
                             <p className="text-xs text-center sm:text-left text-slate-500 dark:text-slate-400">
                                 Account created on {accountCreatedDate}
                             </p>
