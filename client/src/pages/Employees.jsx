@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import api from "../api/axios.js";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Card, { CardHeader, CardTitle, CardContent } from "../components/ui/Card.jsx";
@@ -12,6 +12,7 @@ import { LuRefreshCw } from "react-icons/lu";
 
 const Employees = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const role = user?.role || "employee";
     const isManagement = ["superAdmin", "admin"].includes(role);
 
@@ -323,17 +324,17 @@ const Employees = () => {
                                                     <th className="text-left px-4 py-2 font-medium text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
                                                         Status
                                                     </th>
-                                                    <th className="text-right px-4 py-2 font-medium text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                                                        Actions
-                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {filteredEmployees.map((emp) => (
+
                                                     <tr
                                                         key={emp._id}
-                                                        className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/60"
+                                                        onClick={() => navigate(`/employee/edit/${emp._id}`)}
+                                                        className="cursor-pointer border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/60"
                                                     >
+
                                                         <td className="px-4 py-2 whitespace-nowrap">
                                                             <div className="flex items-center gap-2">
                                                                 {/* <AvatarCircle name={emp.fullName} /> */}
@@ -360,15 +361,8 @@ const Employees = () => {
                                                         <td className="px-4 py-2 whitespace-nowrap">
                                                             <StatusBadge status={emp.status} />
                                                         </td>
-                                                        <td className="px-4 py-2 text-right whitespace-nowrap">
-                                                            <NavLink
-                                                                to={`/employee/edit/${emp._id}`}
-                                                                className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                                                            >
-                                                                More
-                                                            </NavLink>
-                                                        </td>
                                                     </tr>
+
                                                 ))}
                                             </tbody>
                                         </table>

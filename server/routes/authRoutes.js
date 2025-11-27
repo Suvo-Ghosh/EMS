@@ -285,9 +285,6 @@ router.post(
 
 
 
-
-
-
 // In-memory OTP store (use a better storage like Redis in production)
 let otpStore = {};
 

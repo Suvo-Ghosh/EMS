@@ -374,6 +374,7 @@ router.get("/users/:id", async (req, res) => {
         email: user.email,
         role: user.role,
         status: user.status,
+        profileImage : user.profileImage,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       },
