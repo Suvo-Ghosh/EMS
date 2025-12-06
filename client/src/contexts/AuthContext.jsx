@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(() => localStorage.getItem("token") || "");
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(!!token); // if token exists, we must verify with /me first
+    const [loading, setLoading] = useState(!!token); // if token exists, verify with /me first
 
     // Load current user if token exists
     useEffect(() => {
@@ -18,8 +18,13 @@ export const AuthProvider = ({ children }) => {
 
             try {
                 const { data } = await api.get("/api/auth/me");
-                if (data.ok) {
-                    setUser(data.user);
+                if (data.ok && data.user) {
+                    setUser({
+                        ...data.user,
+                        permissions: Array.isArray(data.user.permissions)
+                            ? data.user.permissions
+                            : [],
+                    });
                 } else {
                     setUser(null);
                     setToken("");
@@ -48,7 +53,13 @@ export const AuthProvider = ({ children }) => {
 
             setToken(data.token);
             localStorage.setItem("token", data.token);
-            setUser(data.user);
+
+            setUser({
+                ...data.user,
+                permissions: Array.isArray(data.user.permissions)
+                    ? data.user.permissions
+                    : [],
+            });
 
             return { ok: true };
         } catch (err) {
@@ -56,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             return {
                 ok: false,
                 message:
-                    err.response?.data?.message || "Invalid email or password"
+                    err.response?.data?.message || "Invalid email or password",
             };
         }
     };
@@ -69,10 +80,34 @@ export const AuthProvider = ({ children }) => {
 
     const updateUser = (updatedUser) => {
         setUser((prev) => {
-            if (!prev) return updatedUser;
-            // merge, so if backend doesn’t send employee etc, we keep it
-            return { ...prev, ...updatedUser };
+            if (!prev) {
+                return {
+                    ...updatedUser,
+                    permissions: Array.isArray(updatedUser?.permissions)
+                        ? updatedUser.permissions
+                        : [],
+                };
+            }
+
+            const merged = { ...prev, ...updatedUser };
+            if (!Array.isArray(merged.permissions)) {
+                merged.permissions = [];
+            }
+            return merged;
         });
+    };
+
+    // 🔹 Permission helpers
+    const hasPermission = (perm) => {
+        if (!user || !perm) return false;
+        const perms = Array.isArray(user.permissions) ? user.permissions : [];
+        return perms.includes("*") || perms.includes(perm);
+    };
+
+    const hasAnyPermission = (permList = []) => {
+        if (!user) return false;
+        if (!permList.length) return true;
+        return permList.some((p) => hasPermission(p));
     };
 
     const value = {
@@ -82,7 +117,9 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!user,
         login,
         logout,
-        updateUser
+        updateUser,
+        hasPermission,
+        hasAnyPermission,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

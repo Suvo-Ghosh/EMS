@@ -1,4 +1,5 @@
 // src/pages/Dashboard.jsx
+import AttendanceCard from "../components/AttendanceCard.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 const Dashboard = () => {
@@ -84,6 +85,8 @@ const Dashboard = () => {
             value="—"
             description="View and download your monthly payslips (coming soon)."
           />
+
+          <AttendanceCard />
         </div>
       )}
 

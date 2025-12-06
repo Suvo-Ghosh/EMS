@@ -9,11 +9,10 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         fullName: "",
         email: "",
         password: "Hashtago@2023",
-        departmentType: "",
+        departmentType: "creative",
         designation: "",
         dateOfJoining: "",
         employmentType: "full-time",
-        role: "employee",
         salaryCtc: "",
         salaryBasic: "",
         salaryHra: "",
@@ -24,11 +23,8 @@ const AddEmployee = ({ onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // 🔹 live employeeCode check: idle | checking | available | taken | error
-    // const [codeStatus, setCodeStatus] = useState("idle");
-    // const [codeStatusMsg, setCodeStatusMsg] = useState("");
-
     const addRef = useRef();
+
     // Close modal if clicked outside
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -40,8 +36,6 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [onClose]);
 
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prevForm) => ({
@@ -50,96 +44,35 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         }));
     };
 
-    // 🔹 Debounced check for employeeCode availability
-    // useEffect(() => {
-    //     // Only for employee role
-    //     if (form.role !== "employee") {
-    //         setCodeStatus("idle");
-    //         setCodeStatusMsg("");
-    //         return;
-    //     }
-
-    //     const code = form.employeeCode.trim();
-
-    //     if (!code) {
-    //         setCodeStatus("idle");
-    //         setCodeStatusMsg("");
-    //         return;
-    //     }
-
-    //     setCodeStatus("checking");
-    //     setCodeStatusMsg("Checking code availability...");
-
-    //     const timer = setTimeout(async () => {
-    //         try {
-    //             const { data } = await api.get("/api/admin/employees/check-code", {
-    //                 params: { employeeCode: code },
-    //             });
-
-    //             if (!data.ok) {
-    //                 setCodeStatus("error");
-    //                 setCodeStatusMsg(data.message || "Could not verify code.");
-    //                 return;
-    //             }
-
-    //             if (data.exists) {
-    //                 setCodeStatus("taken");
-    //                 setCodeStatusMsg("This employee code is already in use.");
-    //             } else {
-    //                 setCodeStatus("available");
-    //                 setCodeStatusMsg("This employee code is available.");
-    //             }
-    //         } catch (err) {
-    //             console.error("Employee code check error:", err);
-    //             setCodeStatus("error");
-    //             setCodeStatusMsg("Error checking employee code.");
-    //         }
-    //     }, 500); // debounce 500ms
-
-    //     return () => clearTimeout(timer);
-    // }, [form.employeeCode, form.role]);
-
     // Handle submit - build payload to match backend expectations
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
 
-        // Small guard on frontend: don't allow submit if code is clearly taken
-        // if (form.role === "employee" && codeStatus === "taken") {
-        //     const msg = "Employee code is already in use. Please choose another.";
-        //     setError(msg);
-        //     toast.error(msg);
-        //     setLoading(false);
-        //     return;
-        // }
-
         try {
             const payload = {
                 fullName: form.fullName,
                 email: form.email,
                 password: form.password,
-                role: form.role,
-                employeeProfile:
-                    form.role === "employee"
-                        ? {
-                            department: form.departmentType,
-                            designation: form.designation || undefined,
-                            dateOfJoining: form.dateOfJoining || undefined,
-                            employmentType: form.employmentType || "full-time",
-                            salary: {
-                                ctc: form.salaryCtc ? Number(form.salaryCtc) : undefined,
-                                basic: form.salaryBasic ? Number(form.salaryBasic) : undefined,
-                                hra: form.salaryHra ? Number(form.salaryHra) : undefined,
-                                allowances: form.salaryAllowances
-                                    ? Number(form.salaryAllowances)
-                                    : undefined,
-                                deductions: form.salaryDeductions
-                                    ? Number(form.salaryDeductions)
-                                    : undefined,
-                            },
-                        }
-                        : undefined,
+                // ❌ no role here; backend will set role: "employee"
+                employeeProfile: {
+                    department: form.departmentType,
+                    designation: form.designation || undefined,
+                    dateOfJoining: form.dateOfJoining || undefined,
+                    employmentType: form.employmentType || "full-time",
+                    salary: {
+                        ctc: form.salaryCtc ? Number(form.salaryCtc) : undefined,
+                        basic: form.salaryBasic ? Number(form.salaryBasic) : undefined,
+                        hra: form.salaryHra ? Number(form.salaryHra) : undefined,
+                        allowances: form.salaryAllowances
+                            ? Number(form.salaryAllowances)
+                            : undefined,
+                        deductions: form.salaryDeductions
+                            ? Number(form.salaryDeductions)
+                            : undefined,
+                    },
+                },
             };
 
             const { data } = await api.post("/api/admin/users", payload);
@@ -166,36 +99,12 @@ const AddEmployee = ({ onClose, onSuccess }) => {
         }
     };
 
-    // const codeStatusColor =
-    //     codeStatus === "taken"
-    //         ? "text-red-500"
-    //         : codeStatus === "available"
-    //             ? "text-emerald-500"
-    //             : codeStatus === "checking"
-    //                 ? "text-slate-500"
-    //                 : codeStatus === "error"
-    //                     ? "text-red-500"
-    //                     : "text-slate-500";
-
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur flex justify-center items-center px-4">
             <div
                 ref={addRef}
-                className="bg-white dark:bg-slate-950 border border-blue-950 mx-4 md:mx-0 rounded-lg shadow-lg w-full max-w-md md:max-w-4xl  overflow-y-auto max-h-[90vh]"
+                className="bg-white dark:bg-slate-950 border border-blue-950 mx-4 md:mx-0 rounded-lg shadow-lg w-full max-w-md md:max-w-4xl overflow-y-auto max-h-[90vh]"
             >
-                {/* <div className="border-b flex justify-between">
-                    <h2 className="text-lg md:text-xl text-center md:text-left font-semibold mb-2 md:mb-4">
-                        Add New Employee
-                    </h2>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-xs"
-                    >
-                        ✕
-                    </button>
-                </div> */}
-
                 <div className="px-4 py-2 md:px-6 md:py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <h2 className="text-lg md:text-xl font-semibold">Add New Employee</h2>
                     <button
@@ -207,8 +116,9 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                     </button>
                 </div>
 
-
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                {error && (
+                    <p className="text-red-500 text-sm mb-2 px-4 md:px-6 pt-2">{error}</p>
+                )}
 
                 <form
                     onSubmit={handleSubmit}
@@ -239,21 +149,6 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                             type="text"
                             readOnly={true}
                         />
-                        <div>
-                            {/* <Input
-                                label="Employee Code"
-                                name="employeeCode"
-                                value={form.employeeCode}
-                                onChange={handleChange}
-                                required={form.role === "employee"}
-                                placeholder="HTEMP101"
-                            /> */}
-                            {/* {form.role === "employee" && form.employeeCode && (
-                                <p className={`mt-1 text-[11px] ${codeStatusColor}`}>
-                                    {codeStatusMsg}
-                                </p>
-                            )} */}
-                        </div>
 
                         <div>
                             <label className="text-xs md:text-sm font-medium">
@@ -271,6 +166,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                                 <option value="sales">Sales</option>
                             </select>
                         </div>
+
                         <Input
                             label="Designation"
                             name="designation"
@@ -348,22 +244,6 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                                 <option value="intern">Intern</option>
                             </select>
                         </div>
-
-                        {/* Role */}
-                        {/* <div>
-                            <label className="text-xs md:text-sm font-medium mb-2">
-                                Role
-                            </label>
-                            <select
-                                name="role"
-                                value={form.role}
-                                onChange={handleChange}
-                                className="block w-full mt-1 p-2 md:p-2.5 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                            >
-                                <option value="employee">Employee</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div> */}
                     </div>
 
                     {/* Buttons row spans full width */}
@@ -371,10 +251,7 @@ const AddEmployee = ({ onClose, onSuccess }) => {
                         <SecondaryButton type="button" onClick={onClose}>
                             Back
                         </SecondaryButton>
-                        <PrimaryButton
-                            type="submit"
-                            disabled={loading}
-                        >
+                        <PrimaryButton type="submit" disabled={loading}>
                             {loading ? "Adding..." : "Add Employee"}
                         </PrimaryButton>
                     </div>

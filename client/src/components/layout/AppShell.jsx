@@ -1,5 +1,5 @@
 // src/components/layout/AppShell.jsx
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { useThemeSetting } from "../../contexts/ThemeContext.jsx";
@@ -10,14 +10,25 @@ import {
     HiOutlineCurrencyRupee,
     HiOutlineUserCircle,
     HiOutlineCog6Tooth,
+    HiOutlineKey,
+    HiDocumentCurrencyRupee,
 } from "react-icons/hi2";
-import { useMemo } from "react";
 
 const navLinkBase =
     "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors";
 const inactiveNav =
     "text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800";
 const activeNav = "bg-slate-200 dark:bg-slate-800";
+
+const PERMISSIONS = {
+    DASHBOARD_VIEW: "dashboard.view",
+    PROFILE_VIEW: "profile.view",
+    SETTINGS_VIEW: "settings.view",
+    MYPAYSLIPS_VIEW: "mypayslips.view",
+    EMPLOYEES_VIEW: "employees.view",
+    PAYROLL_VIEW: "payroll.view",
+    ROLE_ACCESS_MANAGE: "roles.manage",
+};
 
 const AppShell = ({ children }) => {
     const { user, logout } = useAuth();
@@ -56,14 +67,13 @@ const AppShell = ({ children }) => {
                 </button>
                 <div className="flex-shrink-0">
                     <div className="size-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
-                        {
-                            user?.profileImage
-                                ? <img src={user?.profileImage} className="rounded-full" />
-                                : initials
-                        }
+                        {user?.profileImage ? (
+                            <img src={user.profileImage} className="rounded-full" />
+                        ) : (
+                            initials
+                        )}
                     </div>
                 </div>
-
             </header>
 
             {/* Mobile sliding sidebar + overlay */}
@@ -97,12 +107,12 @@ const AppShell = ({ children }) => {
                 {/* Desktop sidebar - fixed, full viewport height */}
                 <aside
                     className="
-                               hidden md:flex
-                               md:fixed md:inset-y-0 md:left-0
-                               md:w-60 xl:w-60 md:flex-col md:h-screen
-                               bg-white dark:bg-slate-950
-                               border-r border-slate-200 dark:border-slate-800
-                               "
+            hidden md:flex
+            md:fixed md:inset-y-0 md:left-0
+            md:w-60 xl:w-60 md:flex-col md:h-screen
+            bg-white dark:bg-slate-950
+            border-r border-slate-200 dark:border-slate-800
+          "
                 >
                     <SidebarContent user={user} theme={theme} logout={logout} />
                 </aside>
@@ -113,13 +123,15 @@ const AppShell = ({ children }) => {
                     <header className="hidden md:flex h-14 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur items-center justify-end px-6">
                         <div className="flex justify-center items-center gap-4">
                             <p>{user?.fullName.trim().split(/\s+/)[0]}</p>
-                            {/* <p>{user?.fullName.trim()}</p> */}
-                            <NavLink to="/profile" className="size-12 cursor-pointer rounded-full bg-blue-600 text-white flex items-center justify-center text-base font-semibold">
-                                {
-                                    user?.profileImage
-                                        ? <img src={user?.profileImage} className="rounded-full" />
-                                        : initials
-                                }
+                            <NavLink
+                                to="/profile"
+                                className="size-12 cursor-pointer rounded-full bg-blue-600 text-white flex items-center justify-center text-base font-semibold"
+                            >
+                                {user?.profileImage ? (
+                                    <img src={user.profileImage} className="rounded-full" />
+                                ) : (
+                                    initials
+                                )}
                             </NavLink>
                         </div>
                     </header>
@@ -135,32 +147,46 @@ const AppShell = ({ children }) => {
 };
 
 const SidebarContent = ({ user, theme, logout, onNavigate }) => {
+    const { hasPermission } = useAuth();
     const role = user?.role || "employee";
-    const isManagement = ["superAdmin", "admin", "hr"].includes(role);
 
-    // Build links depending on role
-    const links = [
-        { to: "/", label: "Dashboard", icon: HiOutlineHome },
-    ];
+    // Build links from permissions – keeps UI in sync with ProtectedRoute
+    const links = [];
 
-    if (isManagement) {
-        links.push({ to: "/employees", label: "Employees", icon: HiOutlineUsers });
-        links.push({ to: "/payroll", label: "Payroll", icon: HiOutlineCurrencyRupee });
-    } else {
-        // employee-specific payroll view
-        links.push({ to: "/my-payslips", label: "My Payslips", icon: HiOutlineCurrencyRupee });
+    if (hasPermission(PERMISSIONS.DASHBOARD_VIEW)) {
+        links.push({ to: "/", label: "Dashboard", icon: HiOutlineHome });
     }
 
-    links.push({ to: "/profile", label: "Profile", icon: HiOutlineUserCircle });
-    links.push({ to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth });
+    if (hasPermission(PERMISSIONS.EMPLOYEES_VIEW)) {
+        links.push({ to: "/employees", label: "Employees", icon: HiOutlineUsers });
+    }
+
+    if (hasPermission(PERMISSIONS.PAYROLL_VIEW)) {
+        links.push({ to: "/payroll", label: "Payroll", icon: HiOutlineCurrencyRupee });
+    }
+
+    if (role !== "superAdmin" && hasPermission(PERMISSIONS.MYPAYSLIPS_VIEW)) {
+        links.push({ to: "/my-payslips", label: "My Payslips", icon: HiDocumentCurrencyRupee });
+    }
+
+    // Role & Access page: usually only superAdmin + permission
+    if (role === "superAdmin" && hasPermission(PERMISSIONS.ROLE_ACCESS_MANAGE)) {
+        links.push({ to: "/role-access", label: "Role & Access", icon: HiOutlineKey, });
+    }
+
+    if (hasPermission(PERMISSIONS.PROFILE_VIEW)) {
+        links.push({ to: "/profile", label: "Profile", icon: HiOutlineUserCircle });
+    }
+
+    if (hasPermission(PERMISSIONS.SETTINGS_VIEW)) {
+        links.push({ to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth });
+    }
 
     return (
         <>
             {/* Logo / title */}
             <div className="h-14 flex items-center px-4 border-b border-slate-200 dark:border-slate-800">
-                <span className="font-semibold text-lg truncate">
-                    EMS &amp; Payroll
-                </span>
+                <span className="font-semibold text-lg truncate">EMS &amp; Payroll</span>
             </div>
 
             {/* Nav */}
@@ -184,7 +210,7 @@ const SidebarContent = ({ user, theme, logout, onNavigate }) => {
                             {user?.fullName || "User"}
                         </div>
                         <div className="uppercase tracking-wide text-[10px] text-slate-500 dark:text-slate-400">
-                            {user?.role || "unknown role"}
+                            {role || "unknown role"}
                         </div>
                     </div>
                     <button

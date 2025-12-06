@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios.js";
 import PageHeader from "../components/ui/PageHeader.jsx";
-import Card, {
-    CardHeader,
-    CardTitle,
-    CardContent,
-} from "../components/ui/Card.jsx";
+import Card, { CardHeader, CardTitle, CardContent } from "../components/ui/Card.jsx";
 
 const monthLabel = (m, y) =>
     new Date(y, m - 1, 1).toLocaleString("default", {

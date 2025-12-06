@@ -61,7 +61,7 @@ const EmployeeEdit = () => {
                     setForm({
                         fullName: data.user.fullName,
                         email: data.user.email,
-                        role: data.user.role,
+                        role: data.user.role, // used only for display (RoleBadge)
                         status: data.user.status,
                         employeeProfile: {
                             employeeCode: data.employee?.employeeCode || "",
@@ -129,10 +129,15 @@ const EmployeeEdit = () => {
         setError("");
 
         try {
-            const { data } = await api.patch(`/api/admin/users/${id}`, {
-                ...form,
+            // We let backend ignore role; this page doesn't change it.
+            const payload = {
+                fullName: form.fullName,
+                email: form.email,
+                status: form.status,
                 employeeProfile: form.employeeProfile,
-            });
+            };
+
+            const { data } = await api.patch(`/api/admin/users/${id}`, payload);
 
             if (data.ok) {
                 toast.success("Employee updated successfully!");
@@ -177,7 +182,7 @@ const EmployeeEdit = () => {
     }
 
     return (
-        <div className="">
+        <div>
             <PageHeader
                 title={form.fullName || "Employee details"}
                 subtitle={form.email || "View and update employee information."}
@@ -198,16 +203,17 @@ const EmployeeEdit = () => {
             <Card className="mb-5">
                 <CardContent className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        {/* <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
-                            {initials || "U"}
-                        </div> */}
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-semibold">
-                                {
-                                    employee?.profileImage
-                                        ? <img src={employee?.profileImage} className="rounded-full" />
-                                        : initials || "U"
-                                }
+                                {employee?.profileImage ? (
+                                    <img
+                                        src={employee.profileImage}
+                                        className="rounded-full"
+                                        alt="avatar"
+                                    />
+                                ) : (
+                                    initials || "U"
+                                )}
                             </div>
                         </div>
                         <div>
@@ -250,13 +256,11 @@ const EmployeeEdit = () => {
             </Card>
 
             {/* Main form */}
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-6"
-            >
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-6 lg:grid-cols-3">
                     {/* Left: Personal & job info */}
                     <div className="space-y-6 lg:col-span-2">
+                        {/* Account & basic */}
                         <Card>
                             <CardContent className="space-y-4">
                                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -283,20 +287,16 @@ const EmployeeEdit = () => {
                                 </div>
 
                                 <div className="grid gap-4 md:grid-cols-2">
+                                    {/* Role is only displayed via badge / text, not editable here */}
                                     <div>
                                         <label className="text-xs md:text-sm font-medium text-slate-700 dark:text-slate-200">
                                             Role
                                         </label>
-                                        <select
-                                            name="role"
-                                            value={form.role}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
-                                        >
-                                            <option value="employee">Employee</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
+                                        <div className="mt-1 text-sm text-slate-800 dark:text-slate-100">
+                                            {form.role}
+                                        </div>
                                     </div>
+
                                     <div>
                                         <label className="text-xs md:text-sm font-medium text-slate-700 dark:text-slate-200">
                                             Status
@@ -316,6 +316,7 @@ const EmployeeEdit = () => {
                             </CardContent>
                         </Card>
 
+                        {/* Job details */}
                         <Card>
                             <CardContent className="space-y-4">
                                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">

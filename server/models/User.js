@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "inactive", "suspended"],
       default: "active"
     },
+    permissions: {
+      type: [String],
+      default: ["dashboard.view", "profile.view", "settings.view", "mypayslips.view"],
+    },
     profileImage: {
       type: String,
       default: ""

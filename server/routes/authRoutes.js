@@ -11,6 +11,7 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { upload, uploadToCloudinary } from "../utils/cloudinary.js";
+import { getEffectivePermissions } from "../utils/permissions.js";
 
 const router = express.Router();
 
@@ -34,9 +35,12 @@ const buildUserPayload = async (userDoc) => {
     employee = await Employee.findOne({ user: userDoc._id }).lean();
   }
 
+  const permissions = getEffectivePermissions(userDoc);
+
   return {
     ...baseUser,
-    employee, // null for non-employees, object for employees
+    employee,// null for non-employees, object for employees
+    permissions,
   };
 };
 
